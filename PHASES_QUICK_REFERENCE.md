@@ -17,19 +17,19 @@ Quick tasks:
 
 ---
 
-## Phase 2: Layout & Navigation
+## Phase 2: Layout & Navigation ✅ COMPLETED
 **Goal**: Responsive layout with working hamburger menu
 **Time estimate**: 1-1.5 hours
 
 Quick tasks:
-- [ ] Create `app/layout.tsx` (root layout)
-- [ ] Create `components/Navigation.tsx` (logic for nav)
-- [ ] Create `components/MobileMenu.tsx` (hamburger drawer)
-- [ ] Create 4 placeholder pages (home, weather, trip, private)
-- [ ] Test navigation on mobile (375px) and desktop (1440px)
-- [ ] Verify hamburger menu appears/disappears at breakpoint
+- [x] Create `app/layout.tsx` (root layout)
+- [x] Create `components/Navigation.tsx` (logic for nav)
+- [x] Create `components/MobileMenu.tsx` (hamburger drawer)
+- [x] Create 4 placeholder pages (home, weather, trip, private)
+- [x] Test navigation on mobile (375px) and desktop (1440px)
+- [x] Verify hamburger menu appears/disappears at breakpoint
 
-**Done when**: All pages linked, hamburger works, responsive tested
+**Done when**: All pages linked, hamburger works, responsive tested ✅
 
 ---
 
