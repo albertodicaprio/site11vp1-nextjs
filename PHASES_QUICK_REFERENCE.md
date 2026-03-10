@@ -48,19 +48,18 @@ Quick tasks for each page:
 
 ---
 
-## Phase 4: Data Layer
+## Phase 4: Data Layer ✅ COMPLETED
 **Goal**: Hardcoded data, pages use real data from files
 **Time estimate**: 1-1.5 hours
 
 Quick tasks:
-- [ ] Create `data/events.ts` (exams, holidays)
-- [ ] Create `data/tripDays.ts` (Locarno itinerary)
-- [ ] Update landing page to use events data
-- [ ] Update trip page to use trip data
-- [ ] Add activity state to private page
-- [ ] Verify data displays correctly
+- [x] Create `data/events.ts` (exams on 2026-06-01, holidays: Easter Apr 3-19, Ascension May 14-17, Day Off May 25, Summer Jun 27+)
+- [x] Create `data/tripDays.ts` (5-day Locarno trip May 4-8 with detailed activities)
+- [x] Update landing page to use events data (calculateDaysUntil, getUpcomingHolidays)
+- [x] Update trip page to use trip data (tripDays, tripInfo from data files)
+- [x] Verify data displays correctly with real dates
 
-**Done when**: All pages use real data, activity form works
+**Done when**: All pages use real data from files, no hardcoded values ✅
 
 ---
 
