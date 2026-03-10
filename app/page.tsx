@@ -1,24 +1,10 @@
 import Link from 'next/link';
-
-function calculateDayUntil(targetDate: Date): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  targetDate.setHours(0, 0, 0, 0);
-  const diffTime = targetDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return Math.max(0, diffDays);
-}
+import { calculateDaysUntil, exams, getUpcomingHolidays } from '@/data/events';
 
 export default function Home() {
-  // Placeholder dates - update with real dates in Phase 6
-  const nextExamDate = new Date('2026-03-27');
-  const daysUntilExam = calculateDayUntil(nextExamDate);
-
-  const holidays = [
-    { name: 'Easter Break', startDate: 'April 9', endDate: 'April 20' },
-    { name: 'Summer Break', startDate: 'July 1', endDate: 'August 31' },
-    { name: 'Autumn Break', startDate: 'October 10', endDate: 'October 17' },
-  ];
+  const nextExam = exams[0];
+  const daysUntilExam = calculateDaysUntil(nextExam.date);
+  const upcomingHolidays = getUpcomingHolidays(3).filter(h => h.name !== 'Class Trip - Locarno');
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -30,25 +16,25 @@ export default function Home() {
       {/* Exam Countdown Card */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-gradient-to-br from-red-500 to-red-600 text-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4">📚 Next Exam</h2>
+          <h2 className="text-2xl font-semibold mb-4">📚 {nextExam.name}</h2>
           <p className="text-5xl font-bold mb-2">{daysUntilExam}</p>
           <p className="text-red-100 mb-2">days until exam</p>
-          <p className="text-sm text-red-100">Exam Date: March 27, 2026</p>
+          <p className="text-sm text-red-100">Exam Date: {new Date(nextExam.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
 
         {/* Quick Stats */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">📅 Holidays</h2>
-          <p className="text-sm text-blue-100 mb-2">{holidays.length} breaks this year</p>
-          <p className="text-2xl font-bold mb-2">Next: Easter</p>
-          <p className="text-xs text-blue-100">April 9 - April 20</p>
+          <p className="text-sm text-blue-100 mb-2">{upcomingHolidays.length} upcoming breaks</p>
+          <p className="text-2xl font-bold mb-2">Next: {upcomingHolidays[0]?.name || 'N/A'}</p>
+          <p className="text-xs text-blue-100">{upcomingHolidays[0] ? new Date(upcomingHolidays[0].startDate).toLocaleDateString() : ''}</p>
         </div>
 
         {/* Class Trip */}
         <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">✈️ Class Trip</h2>
           <p className="text-lg font-bold mb-2">Locarno</p>
-          <p className="text-sm text-green-100 mb-4">Switzerland Summer 2026</p>
+          <p className="text-sm text-green-100 mb-4">May 4-8, 2026</p>
           <Link href="/class-trip" className="inline-block bg-white text-green-600 px-4 py-2 rounded font-semibold hover:bg-green-50 transition-colors">
             Learn More →
           </Link>
@@ -59,14 +45,14 @@ export default function Home() {
       <div className="mb-12">
         <h2 className="text-3xl font-bold mb-6">🎉 School Holidays</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {holidays.map((holiday, idx) => (
+          {upcomingHolidays.map((holiday, idx) => (
             <div key={idx} className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
               <h3 className="text-xl font-semibold mb-2">{holiday.name}</h3>
               <p className="text-gray-600">
-                <strong>From:</strong> {holiday.startDate}
+                <strong>From:</strong> {new Date(holiday.startDate).toLocaleDateString()}
               </p>
               <p className="text-gray-600">
-                <strong>To:</strong> {holiday.endDate}
+                <strong>To:</strong> {new Date(holiday.endDate).toLocaleDateString()}
               </p>
             </div>
           ))}
