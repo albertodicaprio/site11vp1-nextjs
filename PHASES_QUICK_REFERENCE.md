@@ -2,18 +2,18 @@
 
 Quick lookup guide for each phase. Use this checklist to track progress.
 
-## Phase 1: Setup & Foundation
+## Phase 1: Setup & Foundation ✅ COMPLETED
 **Goal**: Initialize project, local dev works
 **Time estimate**: 30-45 minutes
 
 Quick tasks:
-- [ ] Run `create-next-app` with TypeScript, Tailwind, App Router
-- [ ] Verify `npm run dev` works on localhost:3000
-- [ ] Create folder structure (`app/`, `components/`, `lib/`, `data/`, `public/`)
-- [ ] Set up `.env.local` template
-- [ ] Verify Tailwind CSS working
+- [x] Run `create-next-app` with TypeScript, Tailwind, App Router
+- [x] Verify `npm run dev` works on localhost:3000
+- [x] Create folder structure (`app/`, `components/`, `lib/`, `data/`, `public/`)
+- [x] Set up `.env.local` template
+- [x] Verify Tailwind CSS working
 
-**Done when**: Dev server runs, no errors, ready for Phase 2
+**Done when**: Dev server runs, no errors, ready for Phase 2 ✅
 
 ---
 
