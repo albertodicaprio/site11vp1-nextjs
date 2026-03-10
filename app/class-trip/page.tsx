@@ -1,118 +1,20 @@
-export default function ClassTripPage() {
-  const tripDays = [
-    {
-      day: 1,
-      date: 'June 15, 2026',
-      title: 'Arrival & Piazza Grande',
-      icon: '🚂',
-      activities: [
-        { time: '09:00', name: 'Depart from Nyon' },
-        { time: '12:30', name: 'Lunch stop in Bellinzona' },
-        { time: '14:00', name: 'Arrive in Locarno' },
-        { time: '16:00', name: 'Explore Piazza Grande' },
-        { time: '19:00', name: 'Dinner at local restaurant' },
-      ],
-    },
-    {
-      day: 2,
-      date: 'June 16, 2026',
-      title: 'Lake Activities',
-      icon: '🏊',
-      activities: [
-        { time: '08:00', name: 'Breakfast at hotel' },
-        { time: '09:30', name: 'Boat tour on Lago Maggiore' },
-        { time: '12:00', name: 'Swimming at Lido beach' },
-        { time: '14:00', name: 'Lunch' },
-        { time: '16:00', name: 'Free time / shopping' },
-        { time: '19:30', name: 'Evening stroll along waterfront' },
-      ],
-    },
-    {
-      day: 3,
-      date: 'June 17, 2026',
-      title: 'Mountain & Casino',
-      icon: '⛰️',
-      activities: [
-        { time: '08:00', name: 'Breakfast at hotel' },
-        { time: '09:00', name: 'Cable car to Cardada mountain' },
-        { time: '11:00', name: 'Hike & panoramic views' },
-        { time: '13:00', name: 'Picnic lunch on mountain' },
-        { time: '15:00', name: 'Descend & visit Casino di Locarno' },
-        { time: '18:00', name: 'Free time in town' },
-      ],
-    },
-    {
-      day: 4,
-      date: 'June 18, 2026',
-      title: 'Cultural Day',
-      icon: '🎪',
-      activities: [
-        { time: '08:00', name: 'Breakfast at hotel' },
-        { time: '09:00', name: 'Visit Madonna del Sasso church' },
-        { time: '11:00', name: 'Museum tour (local art & history)' },
-        { time: '13:00', name: 'Lunch in old town' },
-        { time: '15:00', name: 'Workshop on Swiss culture' },
-        { time: '19:00', name: 'Special dinner experience' },
-      ],
-    },
-    {
-      day: 5,
-      date: 'June 19, 2026',
-      title: 'Adventure & Adventures',
-      icon: '🧗',
-      activities: [
-        { time: '08:00', name: 'Breakfast at hotel' },
-        { time: '09:30', name: 'Rock climbing experience' },
-        { time: '12:00', name: 'Lunch break' },
-        { time: '13:00', name: 'Mountain biking on trails' },
-        { time: '16:00', name: 'Return to hotel' },
-        { time: '19:00', name: 'Class dinner & reflection' },
-      ],
-    },
-    {
-      day: 6,
-      date: 'June 20, 2026',
-      title: 'Return & Goodbye',
-      icon: '🏠',
-      activities: [
-        { time: '08:00', name: 'Final breakfast in Locarno' },
-        { time: '10:00', name: 'Last shopping & souvenirs' },
-        { time: '11:30', name: 'Depart Locarno' },
-        { time: '15:00', name: 'Lunch stop' },
-        { time: '17:00', name: 'Arrive back in Nyon' },
-      ],
-    },
-  ];
+import { tripDays, tripInfo, getTotalActivities } from '@/data/tripDays';
 
-  const tripInfo = {
-    location: 'Locarno, Switzerland',
-    duration: '6 days / 5 nights',
-    elevation: '196m above sea level',
-    totalActivities: tripDays.reduce((sum, day) => sum + day.activities.length, 0),
-    highlights: ['Lake Maggiore', 'Cardada Mountain', 'Cultural activities', 'Adventure sports'],
-    whatToBring: [
-      'Passport and travel documents',
-      'Comfortable walking shoes',
-      'Swimsuit and sunscreen (SPF 30+)',
-      'Light jacket (evenings can be cool)',
-      'Personal medications',
-      'Backpack for daily activities',
-      'Cash and credit card',
-    ],
-  };
+export default function ClassTripPage() {
+  const totalActivities = getTotalActivities();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-2">Class Trip: Locarno 2026</h1>
-        <p className="text-gray-600 mb-8">June 15-20, 2026 | A 6-day adventure in Switzerland's sunny south</p>
+        <p className="text-gray-600 mb-8">{tripInfo.duration} - A trip to Switzerland's sunny south</p>
       </div>
 
       {/* Trip Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg shadow">
           <p className="text-sm text-blue-100 mb-1">Location</p>
-          <p className="text-xl font-bold">{tripInfo.location}</p>
+          <p className="text-xl font-bold">{tripInfo.destination}</p>
         </div>
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg shadow">
           <p className="text-sm text-purple-100 mb-1">Duration</p>
@@ -124,7 +26,7 @@ export default function ClassTripPage() {
         </div>
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg shadow">
           <p className="text-sm text-orange-100 mb-1">Activities</p>
-          <p className="text-xl font-bold">{tripInfo.totalActivities}+</p>
+          <p className="text-xl font-bold">{totalActivities}+</p>
         </div>
       </div>
 
@@ -153,7 +55,7 @@ export default function ClassTripPage() {
                       <span className="inline-block mr-3">{tripDay.icon}</span>
                       Day {tripDay.day}: {tripDay.title}
                     </h3>
-                    <p className="text-blue-700 text-sm mt-1">{tripDay.date}</p>
+                    <p className="text-blue-700 text-sm mt-1">{new Date(tripDay.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                 </div>
               </div>
