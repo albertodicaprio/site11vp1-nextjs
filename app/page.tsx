@@ -1,24 +1,118 @@
+import Link from 'next/link';
+
+function calculateDayUntil(targetDate: Date): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  const diffTime = targetDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+}
+
 export default function Home() {
+  // Placeholder dates - update with real dates in Phase 6
+  const nextExamDate = new Date('2026-03-27');
+  const daysUntilExam = calculateDayUntil(nextExamDate);
+
+  const holidays = [
+    { name: 'Easter Break', startDate: 'April 9', endDate: 'April 20' },
+    { name: 'Summer Break', startDate: 'July 1', endDate: 'August 31' },
+    { name: 'Autumn Break', startDate: 'October 10', endDate: 'October 17' },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-4">Welcome to Class 11VP1</h1>
-      <p className="text-gray-600 mb-8">Official website for Class 11VP1</p>
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold mb-2">Welcome to Class 11VP1</h1>
+        <p className="text-gray-600 text-lg">Official website for our class at school in Nyon, Switzerland</p>
+      </div>
       
-      {/* Placeholder content for landing page */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-3">Exam Countdown</h2>
-          <p className="text-gray-600">Coming soon...</p>
+      {/* Exam Countdown Card */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 text-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">📚 Next Exam</h2>
+          <p className="text-5xl font-bold mb-2">{daysUntilExam}</p>
+          <p className="text-red-100 mb-2">days until exam</p>
+          <p className="text-sm text-red-100">Exam Date: March 27, 2026</p>
         </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-3">Holidays</h2>
-          <p className="text-gray-600">Coming soon...</p>
+
+        {/* Quick Stats */}
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">📅 Holidays</h2>
+          <p className="text-sm text-blue-100 mb-2">{holidays.length} breaks this year</p>
+          <p className="text-2xl font-bold mb-2">Next: Easter</p>
+          <p className="text-xs text-blue-100">April 9 - April 20</p>
         </div>
-        
+
+        {/* Class Trip */}
+        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">✈️ Class Trip</h2>
+          <p className="text-lg font-bold mb-2">Locarno</p>
+          <p className="text-sm text-green-100 mb-4">Switzerland Summer 2026</p>
+          <Link href="/class-trip" className="inline-block bg-white text-green-600 px-4 py-2 rounded font-semibold hover:bg-green-50 transition-colors">
+            Learn More →
+          </Link>
+        </div>
+      </div>
+
+      {/* Holidays Section */}
+      <div className="mb-12">
+        <h2 className="text-3xl font-bold mb-6">🎉 School Holidays</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {holidays.map((holiday, idx) => (
+            <div key={idx} className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+              <h3 className="text-xl font-semibold mb-2">{holiday.name}</h3>
+              <p className="text-gray-600">
+                <strong>From:</strong> {holiday.startDate}
+              </p>
+              <p className="text-gray-600">
+                <strong>To:</strong> {holiday.endDate}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Events Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-3">Class Trip</h2>
-          <p className="text-gray-600">Locarno, Switzerland</p>
+          <h3 className="text-2xl font-semibold mb-4">📍 On This Website</h3>
+          <ul className="space-y-3 text-gray-600">
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-3 font-bold">•</span>
+              <span><strong>Weather:</strong> Live weather for Nyon</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-3 font-bold">•</span>
+              <span><strong>Class Trip:</strong> Full itinerary for Locarno</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-3 font-bold">•</span>
+              <span><strong>Private Space:</strong> Propose trip activities</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-3 font-bold">•</span>
+              <span><strong>TeamUp:</strong> Weekly class schedule</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-2xl font-semibold mb-4">🔗 Quick Links</h3>
+          <div className="space-y-2">
+            <Link href="/weather" className="block text-blue-600 hover:text-blue-800 hover:underline">
+              → Check Weather in Nyon
+            </Link>
+            <Link href="/class-trip" className="block text-blue-600 hover:text-blue-800 hover:underline">
+              → View Trip Details
+            </Link>
+            <Link href="/private" className="block text-blue-600 hover:text-blue-800 hover:underline">
+              → Propose Activities (Login Required)
+            </Link>
+            <a href="https://teamup.com" target="_blank" rel="noopener noreferrer" className="block text-blue-600 hover:text-blue-800 hover:underline">
+              → Open TeamUp Schedule
+            </a>
+          </div>
         </div>
       </div>
     </div>

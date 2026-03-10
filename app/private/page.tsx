@@ -2,67 +2,111 @@
 
 import { useState } from 'react';
 
+interface ActivityProposal {
+  id: string;
+  proposedBy: string;
+  activity: string;
+  date: string;
+  timestamp: number;
+}
+
 export default function PrivatePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
-  const [activities, setActivities] = useState<Array<{ id: number; title: string; date: string }>>([]);
-  const [newActivity, setNewActivity] = useState({ title: '', date: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [activities, setActivities] = useState<ActivityProposal[]>([
+    {
+      id: '1',
+      proposedBy: 'Sophie M.',
+      activity: 'Rock climbing competition',
+      date: '2026-06-19',
+      timestamp: Date.now() - 86400000,
+    },
+    {
+      id: '2',
+      proposedBy: 'Marco L.',
+      activity: 'Beach volleyball tournament',
+      date: '2026-06-16',
+      timestamp: Date.now() - 172800000,
+    },
+  ]);
+  const [newProposerName, setNewProposerName] = useState('');
+  const [newActivityText, setNewActivityText] = useState('');
+  const [newActivityDate, setNewActivityDate] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple password check (placeholder for MVP)
+    setPasswordError('');
     if (password === 'class11vp1') {
       setIsLoggedIn(true);
       setPassword('');
     } else {
-      alert('Invalid password');
+      setPasswordError('Incorrect password. Please try again.');
     }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setPassword('');
+    setNewProposerName('');
+    setNewActivityText('');
+    setNewActivityDate('');
   };
 
   const handleAddActivity = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newActivity.title.trim()) {
-      setActivities([
-        ...activities,
-        {
-          id: Date.now(),
-          title: newActivity.title,
-          date: newActivity.date,
-        },
-      ]);
-      setNewActivity({ title: '', date: '' });
+    if (newProposerName.trim() && newActivityText.trim() && newActivityDate) {
+      const newActivity: ActivityProposal = {
+        id: Date.now().toString(),
+        proposedBy: newProposerName,
+        activity: newActivityText,
+        date: newActivityDate,
+        timestamp: Date.now(),
+      };
+      setActivities([newActivity, ...activities]);
+      setNewProposerName('');
+      setNewActivityText('');
+      setNewActivityDate('');
     }
   };
 
   if (!isLoggedIn) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">Private Space</h1>
-        
-        <div className="max-w-md bg-white p-8 rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-6">Login Required</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8 text-center">
+          <h1 className="text-4xl font-bold mb-2">🔐 Private Space</h1>
+          <p className="text-purple-100 mb-8">Class 11VP1 - Exclusive Area</p>
+          
+          <form onSubmit={handleLogin} className="max-w-md mx-auto">
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-left text-purple-100 text-sm font-semibold mb-2">
+                Enter Password
               </label>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter class password"
+                className="w-full px-4 py-3 rounded bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300"
               />
             </div>
+            
+            {passwordError && (
+              <p className="text-red-200 text-sm mb-4 bg-red-900 bg-opacity-30 px-4 py-2 rounded">
+                {passwordError}
+              </p>
+            )}
+            
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="w-full bg-white text-purple-600 font-bold py-3 rounded hover:bg-purple-50 transition-colors"
             >
-              Login
+              🔓 Login
             </button>
           </form>
-          <p className="text-sm text-gray-600 mt-4">Hint: Use "class11vp1" for demo</p>
+
+          <p className="text-purple-100 text-sm mt-8 italic">💡 Hint: Think of something related to our class...</p>
         </div>
       </div>
     );
@@ -71,51 +115,65 @@ export default function PrivatePage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Activity Proposals</h1>
+        <div>
+          <h1 className="text-4xl font-bold">Welcome to Class 11VP1 Private Space</h1>
+          <p className="text-gray-600 mt-2">Propose activities for our class trip to Locarno</p>
+        </div>
         <button
-          onClick={() => setIsLoggedIn(false)}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded transition-colors"
         >
-          Logout
+          🚪 Logout
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Add Activity Form */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Proposal Form */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow sticky top-20">
-            <h2 className="text-2xl font-semibold mb-4">Propose Activity</h2>
+          <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow-lg sticky top-4">
+            <h2 className="text-2xl font-bold mb-6">💡 Propose Activity</h2>
             <form onSubmit={handleAddActivity} className="space-y-4">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Activity Name
-                </label>
+                <label className="block text-green-100 text-sm font-semibold mb-2">Your Name *</label>
                 <input
                   type="text"
-                  id="title"
-                  value={newActivity.title}
-                  onChange={(e) => setNewActivity({ ...newActivity, title: e.target.value })}
-                  placeholder="e.g., Hiking tour"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={newProposerName}
+                  onChange={(e) => setNewProposerName(e.target.value)}
+                  placeholder="e.g., Sophie M."
+                  className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
+                  required
                 />
               </div>
+              
               <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Suggested Date
-                </label>
+                <label className="block text-green-100 text-sm font-semibold mb-2">Activity *</label>
+                <textarea
+                  value={newActivityText}
+                  onChange={(e) => setNewActivityText(e.target.value)}
+                  placeholder="Describe your activity idea..."
+                  className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm resize-none h-24"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-green-100 text-sm font-semibold mb-2">Suggested Date *</label>
                 <input
                   type="date"
-                  id="date"
-                  value={newActivity.date}
-                  onChange={(e) => setNewActivity({ ...newActivity, date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={newActivityDate}
+                  onChange={(e) => setNewActivityDate(e.target.value)}
+                  min="2026-06-15"
+                  max="2026-06-20"
+                  className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
+                  required
                 />
               </div>
+              
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="w-full bg-white text-green-600 font-bold py-2 rounded hover:bg-green-50 transition-colors mt-4"
               >
-                Add Activity
+                ✓ Add Activity
               </button>
             </form>
           </div>
@@ -123,26 +181,39 @@ export default function PrivatePage() {
 
         {/* Activities List */}
         <div className="lg:col-span-2">
-          <h2 className="text-2xl font-semibold mb-4">Proposed Activities</h2>
+          <h2 className="text-2xl font-bold mb-6">📋 Proposed Activities ({activities.length})</h2>
+          
           {activities.length === 0 ? (
-            <div className="bg-white p-6 rounded-lg shadow text-gray-600">
-              <p>No activities proposed yet. Be the first to suggest one!</p>
+            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <p className="text-gray-600 text-lg">No activities proposed yet. Be the first to suggest something! 🎉</p>
             </div>
           ) : (
             <div className="space-y-4">
               {activities.map((activity) => (
-                <div key={activity.id} className="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                  <h3 className="text-xl font-semibold mb-2">{activity.title}</h3>
-                  {activity.date && (
-                    <p className="text-gray-600">
-                      <strong>Suggested Date:</strong> {new Date(activity.date).toLocaleDateString()}
-                    </p>
-                  )}
+                <div key={activity.id} className="bg-white rounded-lg shadow border-l-4 border-green-500 p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="font-bold text-lg text-gray-800">{activity.activity}</p>
+                    <span className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
+                      {activity.date}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-1">✏️ Proposed by: <strong>{activity.proposedBy}</strong></p>
+                  <p className="text-xs text-gray-400">
+                    Added {Math.floor((Date.now() - activity.timestamp) / 86400000)} days ago
+                  </p>
                 </div>
               ))}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Info Box */}
+      <div className="mt-12 bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+        <p className="text-blue-800">
+          <strong>📌 Note:</strong> These activities are stored locally and will be lost if you refresh the page. 
+          In Phase 4, we'll set up a database to save your proposals permanently.
+        </p>
       </div>
     </div>
   );
