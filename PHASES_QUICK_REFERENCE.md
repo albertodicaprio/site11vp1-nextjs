@@ -33,18 +33,18 @@ Quick tasks:
 
 ---
 
-## Phase 3: Pages - Static Content
+## Phase 3: Pages - Static Content ✅ COMPLETED
 **Goal**: All 5 pages built with static content
 **Time estimate**: 2-2.5 hours
 
 Quick tasks for each page:
-- [ ] **Landing**: Exam countdown, holidays list, trip teaser
-- [ ] **Weather**: Static mockup weather display
-- [ ] **Trip**: Placeholder daily itinerary
-- [ ] **Private**: Login form placeholder, activity form
-- [ ] Test responsive layout (375px, 768px, 1440px)
+- [x] **Landing**: Exam countdown (to 2026-03-27), holidays list (Easter/Summer/Autumn), trip teaser with Link
+- [x] **Weather**: Static mockup with current weather, 24-hour forecast, 7-day table
+- [x] **Trip**: Full 6-day itinerary (June 15-20) with timestamps, activities, icons
+- [x] **Private**: Enhanced login form, enhanced activity proposal form with name field
+- [x] Test responsive layout (375px, 768px, 1440px)
 
-**Done when**: All pages display content, responsive layout verified
+**Done when**: All pages display content, responsive layout verified ✅
 
 ---
 
