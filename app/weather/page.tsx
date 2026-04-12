@@ -2,8 +2,175 @@
 
 import { useEffect, useRef } from 'react';
 
+function buildWeekChart(Chart: any, dayData: any) {
+  // Create 8-Day Forecast Chart
+  const dayLabels = dayData.slice(1).map((day: any) => {
+    const date = new Date(day.date_time);
+    return date.toLocaleDateString('fr-CH', { weekday: 'short' });
+  });
+
+  const minTemps = dayData.slice(1).map((day: any) => day.TN_C);
+  const maxTemps = dayData.slice(1).map((day: any) => day.TX_C);
+  const dayPrecips = dayData.slice(1).map((day: any) => day.PROBPCP_PERCENT);
+
+  const dayChartCanvas = document.getElementById('weekTempChart') as HTMLCanvasElement;
+  new Chart(dayChartCanvas, {
+    type: 'line',
+    data: {
+      labels: dayLabels,
+      datasets: [
+        {
+          label: 'Max Temperature (°C)',
+          data: maxTemps,
+          type: 'line',
+          tension: 0.3,
+          fill: false,
+          backgroundColor: 'rgba(255, 99, 71, 0.2)',
+          borderColor: 'darkorange',
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(255, 99, 71, 0.8)',
+          pointBorderColor: 'darkorange',
+          yAxisID: 'y',
+        },
+        {
+          label: 'Min Temperature (°C)',
+          data: minTemps,
+          type: 'line',
+          tension: 0.3,
+          fill: '-1',
+          backgroundColor: 'rgba(255, 208, 0, 0.2)',
+          borderColor: 'orange',
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(255, 208, 0, 0.8)',
+          pointBorderColor: 'orange',
+          yAxisID: 'y',
+        },
+        {
+          label: 'Précipitations (%)',
+          data: dayPrecips,
+          type: 'line',
+          tension: 0.3,
+          fill: true,
+          backgroundColor: 'rgba(0,150,255,0.2)',
+          borderColor: 'blue',
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(0,150,255,0.8)',
+          pointBorderColor: 'blue',
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'category',
+          title: {
+            display: true,
+            text: 'Day',
+          },
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: { display: true, text: 'Temperature °C', color: 'black' },
+          ticks: { color: 'black' },
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          title: { display: true, text: 'Précipitations %', color: 'black' },
+          ticks: { color: 'black' },
+          grid: { drawOnChartArea: false },
+        },
+      },
+    },
+  });
+}
+
+function buildDayChart(Chart: any, hourData: any) {
+  // Create 24-Hour Forecast Chart
+  const now = new Date();
+  const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+  const hourlyData = hourData.filter((hour: any) => {
+    const hourTime = new Date(hour.date_time);
+    return hourTime >= now && hourTime <= next24h;
+  });
+
+  const hourLabels = hourlyData.map((hour: any) => {
+    const date = new Date(hour.date_time);
+    return date.toLocaleTimeString('fr-CH', { hour: '2-digit', minute: '2-digit' });
+  });
+
+  const hourTemps = hourlyData.map((hour: any) => hour.TTT_C);
+  const hourPrecips = hourlyData.map((hour: any) => hour.PROBPCP_PERCENT);
+
+  const hourChartCanvas = document.getElementById('dayTempChart') as HTMLCanvasElement;
+  new Chart(hourChartCanvas, {
+    type: 'line',
+    data: {
+      labels: hourLabels,
+      datasets: [
+        {
+          label: 'Temperature (°C)',
+          data: hourTemps,
+          type: 'line',
+          tension: 0.3,
+          fill: true,
+          backgroundColor: 'rgba(255, 208, 0, 0.2)',
+          borderColor: 'orange',
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(255, 208, 0, 0.8)',
+          pointBorderColor: 'orange',
+          yAxisID: 'y',
+        },
+        {
+          label: 'Précipitations (%)',
+          data: hourPrecips,
+          type: 'line',
+          tension: 0.3,
+          fill: true,
+          backgroundColor: 'rgba(0,150,255,0.2)',
+          borderColor: 'blue',
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(0,150,255,0.8)',
+          pointBorderColor: 'blue',
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'category',
+          title: {
+            display: true,
+            text: 'Time',
+          },
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: { display: true, text: 'Temperature °C', color: 'black' },
+          ticks: { color: 'black' },
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          title: { display: true, text: 'Précipitations %', color: 'black' },
+          ticks: { color: 'black' },
+          grid: { drawOnChartArea: false },
+        },
+      },
+    },
+  });
+}
+
 export default function WeatherPage() {
-  const chartRef = useRef<HTMLCanvasElement>(null);
 
   const currentWeather = {
     temp: 14,
@@ -16,7 +183,7 @@ export default function WeatherPage() {
   };
 
   useEffect(() => {
-    const loadChart = async () => {
+    const loadCharts = async () => {
       // Load Chart.js library
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
@@ -27,96 +194,17 @@ export default function WeatherPage() {
           const res = await fetch('/api/meteo');
           const data = await res.json();
 
-          // Use the days array from the API (skip today, which is the first element)
-          const labels = data.forecast.days.slice(1).map((day: any) => {
-            const date = new Date(day.date_time);
-            return date.toLocaleDateString('fr-CH', { weekday: 'short' });
-          });
-
-          const minTemps = data.forecast.days.slice(1).map((day: any) => day.TN_C);
-          const maxTemps = data.forecast.days.slice(1).map((day: any) => day.TX_C);
-          const precips = data.forecast.days.slice(1).map((day: any) => day.PROBPCP_PERCENT);
-
-          if (chartRef.current && (window as any).Chart) {
+          if ((window as any).Chart) {
             const Chart = (window as any).Chart;
             Chart.defaults.color = '#000000';
 
-            new Chart(chartRef.current, {
-              type: 'line',
-              data: {
-                labels: labels,
-                datasets: [
-                  {
-                    label: 'Max Temperature (°C)',
-                    data: maxTemps,
-                    type: 'line',
-                    tension: 0.3,
-                    fill: false,
-                    backgroundColor: 'rgba(255, 99, 71, 0.2)',
-                    borderColor: 'rgb(255, 99, 71)',
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgb(255, 99, 71)',
-                    pointBorderColor: 'rgb(255, 99, 71)',
-                    yAxisID: 'y',
-                  },
-                  {
-                    label: 'Min Temperature (°C)',
-                    data: minTemps,
-                    type: 'line',
-                    tension: 0.3,
-                    fill: '-1',
-                    backgroundColor: 'rgba(255, 99, 71, 0.2)',
-                    borderColor: 'rgb(255, 154, 71)',
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgb(255, 154, 71)',
-                    pointBorderColor: 'rgb(255, 154, 71)',
-                    yAxisID: 'y',
-                  },
-                  {
-                    label: 'Précipitations (%)',
-                    data: precips,
-                    type: 'line',
-                    tension: 0.3,
-                    fill: true,
-                    backgroundColor: 'rgba(0,150,255,0.2)',
-                    borderColor: 'blue',
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(0,150,255,0.8)',
-                    pointBorderColor: 'blue',
-                    yAxisID: 'y1',
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    type: 'category',
-                    title: {
-                      display: true,
-                      text: 'Day',
-                    },
-                  },
-                  y: {
-                    type: 'linear',
-                    position: 'left',
-                    title: { display: true, text: 'Temperature °C', color: 'black' },
-                    ticks: { color: 'black' },
-                  },
-                  y1: {
-                    type: 'linear',
-                    position: 'right',
-                    title: { display: true, text: 'Précipitations %', color: 'black' },
-                    ticks: { color: 'black' },
-                    grid: { drawOnChartArea: false },
-                  },
-                },
-              },
-            });
+            buildWeekChart(Chart, data.forecast.days);
+
+            buildDayChart(Chart, data.forecast.hours);
+
           }
         } catch (error) {
-          console.error('Failed to load weather chart:', error);
+          console.error('Failed to load weather charts:', error);
         }
       };
 
@@ -125,7 +213,7 @@ export default function WeatherPage() {
       }
     };
 
-    loadChart();
+    loadCharts();
   }, []);
 
   return (
@@ -162,7 +250,7 @@ export default function WeatherPage() {
       {/* 24-Hour Forecast */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-6">24-Hour Forecast</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
           <canvas id="dayTempChart"></canvas>
         </div>
       </div>
@@ -171,7 +259,7 @@ export default function WeatherPage() {
       <div>
         <h2 className="text-3xl font-bold mb-6">8-Day Forecast</h2>
         <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
-          <canvas ref={chartRef} id="weekTempChart"></canvas>
+          <canvas id="weekTempChart"></canvas>
         </div>
         <p className="text-sm text-gray-600 mt-4 italic">
           Données meteo en temps réel via <a href="https://developer.srgssr.ch/en/apis/srf-meteoapi-v2" target="_blank">SRG SSR API</a>
