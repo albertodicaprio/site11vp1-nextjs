@@ -37,8 +37,15 @@ function buildWeekChart(Chart: any, dayData: any) {
   const maxTemps = dayData.slice(1).map((day: any) => day.TX_C);
   const dayPrecips = dayData.slice(1).map((day: any) => day.PROBPCP_PERCENT);
 
-  const dayChartCanvas = document.getElementById('weekTempChart') as HTMLCanvasElement;
-  new Chart(dayChartCanvas, {
+  const weekTempCanvas = document.getElementById('weekTempChart') as HTMLCanvasElement;
+
+  // Destroy existing chart if it exists
+  const existingChart = Chart.getChart(weekTempCanvas);
+  if (existingChart) {
+    existingChart.destroy();
+  }
+
+  new Chart(weekTempCanvas, {
     type: 'line',
     data: {
       labels: dayLabels,
@@ -131,8 +138,15 @@ function buildDayChart(Chart: any, hourData: any) {
   const hourTemps = hourlyData.map((hour: any) => hour.TTT_C);
   const hourPrecips = hourlyData.map((hour: any) => hour.PROBPCP_PERCENT);
 
-  const hourChartCanvas = document.getElementById('dayTempChart') as HTMLCanvasElement;
-  new Chart(hourChartCanvas, {
+  const dayTempCanvas = document.getElementById('dayTempChart') as HTMLCanvasElement;
+
+  // Destroy existing chart if it exists
+  const existingChart = Chart.getChart(dayTempCanvas);
+  if (existingChart) {
+    existingChart.destroy();
+  }
+
+  new Chart(dayTempCanvas, {
     type: 'line',
     data: {
       labels: hourLabels,
@@ -201,36 +215,58 @@ export default function WeatherPage() {
     windSpeed: 0,
     feelsLike: 0,
     location: 'Nyon, Switzerland',
-    iconCode: 0,
+    iconCode: 1,
   });
 
+  const loadedRef = useRef(false);
+
   useEffect(() => {
+    // Prevent loading twice due to React Strict Mode
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+
     const loadCharts = async () => {
-      // Load Chart.js library
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-      script.async = true;
-
-      script.onload = async () => {
-        try {
-          const res = await fetch('/api/meteo');
-          const data = await res.json();
-
+      // Load Chart.js library if not already loaded
+      const loadChartJS = () => {
+        return new Promise<void>((resolve) => {
           if ((window as any).Chart) {
-            const Chart = (window as any).Chart;
-            Chart.defaults.color = '#000000';
-
-            buildCurrentWeather(setCurrentWeather, data.forecast.hours);
-            buildDayChart(Chart, data.forecast.hours);
-            buildWeekChart(Chart, data.forecast.days);
+            resolve();
+            return;
           }
-        } catch (error) {
-          console.error('Failed to load weather charts:', error);
-        }
+
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+          script.async = true;
+          script.onload = () => resolve();
+
+          if (!document.querySelector('script[src="https://cdn.jsdelivr.net/npm/chart.js"]')) {
+            document.head.appendChild(script);
+          } else {
+            // Script already exists, wait a bit for it to load
+            setTimeout(resolve, 100);
+          }
+        });
       };
 
-      if (!document.querySelector('script[src="https://cdn.jsdelivr.net/npm/chart.js"]')) {
-        document.head.appendChild(script);
+      try {
+        // Always fetch data first
+        const res = await fetch('/api/meteo');
+        const data = await res.json();
+
+        buildCurrentWeather(setCurrentWeather, data.forecast.hours);
+
+        // Wait for Chart.js to be loaded
+        await loadChartJS();
+
+        if ((window as any).Chart) {
+          const Chart = (window as any).Chart;
+          Chart.defaults.color = '#000000';
+
+          buildDayChart(Chart, data.forecast.hours);
+          buildWeekChart(Chart, data.forecast.days);
+        }
+      } catch (error) {
+        console.error('Failed to load weather data:', error);
       }
     };
 
