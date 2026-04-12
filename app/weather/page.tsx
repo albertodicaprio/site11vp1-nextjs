@@ -10,19 +10,29 @@ export default function WeatherPage() {
     icon: '⛅',
   };
 
-  const forecast = [
+  const forecastDay = [
     { time: '09:00', temp: 12, condition: 'Cloudy', icon: '☁️' },
     { time: '12:00', temp: 16, condition: 'Partly Sunny', icon: '⛅' },
-    { time: '15:00', temp: 17, condition: 'Sunny', icon: '☀️' },
+    { time: '15:00', temp: 23, condition: 'Sunny', icon: '☀️' },
     { time: '18:00', temp: 14, condition: 'Cloudy', icon: '☁️' },
     { time: '21:00', temp: 11, condition: 'Rainy', icon: '🌧️' },
+  ];
+
+  const forecastWeek = [
+    { day: 'Monday', high: 18, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
+    { day: 'Tuesday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
+    { day: 'Wednesday', high: 15, low: 10, condition: 'Cloudy', icon: '☁️' },
+    { day: 'Thursday', high: 19, low: 13, condition: 'Sunny', icon: '☀️' },
+    { day: 'Friday', high: 20, low: 14, condition: 'Sunny', icon: '☀️' },
+    { day: 'Saturday', high: 17, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
+    { day: 'Sunday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-2">Weather in Nyon, Switzerland</h1>
       <p className="text-gray-600 mb-8">Location: 46.38°N, 6.24°E | Real-time data coming in Phase 5</p>
-      
+
       {/* Current Weather */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Main Weather Card */}
@@ -37,12 +47,12 @@ export default function WeatherPage() {
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <p className="text-blue-100 text-sm">Humidity</p>
-                <p className="text-3xl font-bold">{currentWeather.humidity}%</p>
+                <p className="text-blue-600 text-sm">Humidity</p>
+                <p className="text-3xl font-bold text-blue-600">{currentWeather.humidity}%</p>
               </div>
               <div className="bg-white bg-opacity-20 rounded-lg p-4 mt-4">
-                <p className="text-blue-100 text-sm">Wind Speed</p>
-                <p className="text-3xl font-bold">{currentWeather.windSpeed} km/h</p>
+                <p className="text-blue-600 text-sm">Wind Speed</p>
+                <p className="text-3xl font-bold text-blue-600">{currentWeather.windSpeed} km/h</p>
               </div>
             </div>
           </div>
@@ -59,11 +69,11 @@ export default function WeatherPage() {
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-6">24-Hour Forecast</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {forecast.map((item, idx) => (
+          {forecastDay.map((item, idx) => (
             <div key={idx} className="bg-white p-4 rounded-lg shadow text-center border-t-4 border-blue-500">
               <p className="font-semibold text-gray-700 mb-2">{item.time}</p>
               <p className="text-4xl mb-2">{item.icon}</p>
-              <p className="text-2xl font-bold mb-1">{item.temp}°C</p>
+              <p className="text-2xl font-bold mb-1 text-black">{item.temp}°C</p>
               <p className="text-xs text-gray-600">{item.condition}</p>
             </div>
           ))}
@@ -85,15 +95,7 @@ export default function WeatherPage() {
               </tr>
             </thead>
             <tbody>
-              {[
-                { day: 'Monday', high: 18, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
-                { day: 'Tuesday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
-                { day: 'Wednesday', high: 15, low: 10, condition: 'Cloudy', icon: '☁️' },
-                { day: 'Thursday', high: 19, low: 13, condition: 'Sunny', icon: '☀️' },
-                { day: 'Friday', high: 20, low: 14, condition: 'Sunny', icon: '☀️' },
-                { day: 'Saturday', high: 17, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
-                { day: 'Sunday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
-              ].map((day, idx) => (
+              {forecastWeek.map((day, idx) => (
                 <tr key={idx} className={`border-t ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                   <td className="px-4 py-3 font-medium text-gray-800">{day.day}</td>
                   <td className="px-4 py-3 text-center text-2xl">{day.icon}</td>
