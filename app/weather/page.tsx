@@ -1,6 +1,30 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
+function buildCurrentWeather(setCurrentWeather: any, hourData: any) {
+  // Update current weather with the most recent hourly data before now
+  const now = new Date();
+  const closestHour = hourData.reduce((closest: any, hour: any) => {
+    const hourTime = new Date(hour.date_time);
+    if (hourTime <= now) {
+      return !closest || hourTime > new Date(closest.date_time) ? hour : closest;
+    }
+    return closest;
+  });
+
+  if (closestHour) {
+    setCurrentWeather({
+      temp: closestHour.TTT_C,
+      humidity: closestHour.RELHUM_PERCENT,
+      windSpeed: closestHour.FF_KMH,
+      feelsLike: closestHour.TTTFEEL_C,
+      location: 'Nyon, Switzerland',
+      iconCode: closestHour.symbol_code,
+    });
+  }
+
+}
 
 function buildWeekChart(Chart: any, dayData: any) {
   // Create 8-Day Forecast Chart
@@ -171,16 +195,14 @@ function buildDayChart(Chart: any, hourData: any) {
 }
 
 export default function WeatherPage() {
-
-  const currentWeather = {
-    temp: 14,
-    condition: 'Partly Cloudy',
-    humidity: 72,
-    windSpeed: 12,
-    feelsLike: 12,
+  const [currentWeather, setCurrentWeather] = useState({
+    temp: 0,
+    humidity: 0,
+    windSpeed: 0,
+    feelsLike: 0,
     location: 'Nyon, Switzerland',
-    icon: '⛅',
-  };
+    iconCode: 0,
+  });
 
   useEffect(() => {
     const loadCharts = async () => {
@@ -198,10 +220,9 @@ export default function WeatherPage() {
             const Chart = (window as any).Chart;
             Chart.defaults.color = '#000000';
 
-            buildWeekChart(Chart, data.forecast.days);
-
+            buildCurrentWeather(setCurrentWeather, data.forecast.hours);
             buildDayChart(Chart, data.forecast.hours);
-
+            buildWeekChart(Chart, data.forecast.days);
           }
         } catch (error) {
           console.error('Failed to load weather charts:', error);
@@ -228,9 +249,14 @@ export default function WeatherPage() {
           <h2 className="text-2xl font-semibold mb-6">Current Weather</h2>
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-7xl mb-4">{currentWeather.icon}</div>
+              <div className="w-32 h-32 mb-4">
+                <img
+                  src={`/weather-icons/${currentWeather.iconCode}.svg`}
+                  alt="weather icon"
+                  className="w-full h-full"
+                />
+              </div>
               <p className="text-6xl font-bold mb-2">{currentWeather.temp}°C</p>
-              <p className="text-xl">{currentWeather.condition}</p>
               <p className="text-blue-100 text-sm mt-2">Feels like {currentWeather.feelsLike}°C</p>
             </div>
             <div className="text-right">
