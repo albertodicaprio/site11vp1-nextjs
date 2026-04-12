@@ -48,7 +48,7 @@ export default function Navigation() {
             ))}
             {/* External TeamUp Link */}
             <a
-              href="https://teamup.com"
+              href="https://teamup.com/ksed29ccbf360b6217"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-100 hover:text-white transition-colors"

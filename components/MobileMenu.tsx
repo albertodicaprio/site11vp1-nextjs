@@ -32,7 +32,7 @@ export default function MobileMenu({ navItems, isActive, onClose }: MobileMenuPr
       ))}
       {/* External TeamUp Link */}
       <a
-        href="https://teamup.com"
+        href="https://teamup.com/ksed29ccbf360b6217"
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}

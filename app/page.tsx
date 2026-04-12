@@ -47,7 +47,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {upcomingHolidays.map((holiday, idx) => (
             <div key={idx} className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-              <h3 className="text-xl font-semibold mb-2">{holiday.name}</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black">{holiday.name}</h3>
               <p className="text-gray-600">
                 <strong>From:</strong> {new Date(holiday.startDate).toLocaleDateString()}
               </p>
@@ -62,7 +62,7 @@ export default function Home() {
       {/* Events Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-2xl font-semibold mb-4">📍 On This Website</h3>
+          <h3 className="text-2xl font-semibold mb-4 text-black">📍 On This Website</h3>
           <ul className="space-y-3 text-gray-600">
             <li className="flex items-start">
               <span className="text-blue-600 mr-3 font-bold">•</span>
@@ -84,7 +84,7 @@ export default function Home() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-2xl font-semibold mb-4">🔗 Quick Links</h3>
+          <h3 className="text-2xl font-semibold mb-4 text-black">🔗 Quick Links</h3>
           <div className="space-y-2">
             <Link href="/weather" className="block text-blue-600 hover:text-blue-800 hover:underline">
               → Check Weather in Nyon
@@ -95,7 +95,7 @@ export default function Home() {
             <Link href="/private" className="block text-blue-600 hover:text-blue-800 hover:underline">
               → Propose Activities (Login Required)
             </Link>
-            <a href="https://teamup.com" target="_blank" rel="noopener noreferrer" className="block text-blue-600 hover:text-blue-800 hover:underline">
+            <a href="https://teamup.com/ksed29ccbf360b6217" target="_blank" rel="noopener noreferrer" className="block text-blue-600 hover:text-blue-800 hover:underline">
               → Open TeamUp Schedule
             </a>
           </div>
