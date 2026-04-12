@@ -1,5 +1,10 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
 export default function WeatherPage() {
-  // Mock weather data - will be replaced with real Open-Meteo API in Phase 5
+  const chartRef = useRef<HTMLCanvasElement>(null);
+
   const currentWeather = {
     temp: 14,
     condition: 'Partly Cloudy',
@@ -10,28 +15,123 @@ export default function WeatherPage() {
     icon: '⛅',
   };
 
-  const forecastDay = [
-    { time: '09:00', temp: 12, condition: 'Cloudy', icon: '☁️' },
-    { time: '12:00', temp: 16, condition: 'Partly Sunny', icon: '⛅' },
-    { time: '15:00', temp: 23, condition: 'Sunny', icon: '☀️' },
-    { time: '18:00', temp: 14, condition: 'Cloudy', icon: '☁️' },
-    { time: '21:00', temp: 11, condition: 'Rainy', icon: '🌧️' },
-  ];
+  useEffect(() => {
+    const loadChart = async () => {
+      // Load Chart.js library
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+      script.async = true;
 
-  const forecastWeek = [
-    { day: 'Monday', high: 18, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
-    { day: 'Tuesday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
-    { day: 'Wednesday', high: 15, low: 10, condition: 'Cloudy', icon: '☁️' },
-    { day: 'Thursday', high: 19, low: 13, condition: 'Sunny', icon: '☀️' },
-    { day: 'Friday', high: 20, low: 14, condition: 'Sunny', icon: '☀️' },
-    { day: 'Saturday', high: 17, low: 12, condition: 'Partly Cloudy', icon: '⛅' },
-    { day: 'Sunday', high: 16, low: 11, condition: 'Rainy', icon: '🌧️' },
-  ];
+      script.onload = async () => {
+        try {
+          const res = await fetch('/api/meteo');
+          const data = await res.json();
+
+          // Use the days array from the API (skip today, which is the first element)
+          const labels = data.forecast.days.slice(1).map((day: any) => {
+            const date = new Date(day.date_time);
+            return date.toLocaleDateString('fr-CH', { weekday: 'short' });
+          });
+
+          const minTemps = data.forecast.days.slice(1).map((day: any) => day.TN_C);
+          const maxTemps = data.forecast.days.slice(1).map((day: any) => day.TX_C);
+          const precips = data.forecast.days.slice(1).map((day: any) => day.PROBPCP_PERCENT);
+
+          if (chartRef.current && (window as any).Chart) {
+            const Chart = (window as any).Chart;
+            Chart.defaults.color = '#000000';
+
+            new Chart(chartRef.current, {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: 'Max Temperature (°C)',
+                    data: maxTemps,
+                    type: 'line',
+                    tension: 0.3,
+                    fill: false,
+                    backgroundColor: 'rgba(255, 99, 71, 0.2)',
+                    borderColor: 'rgb(255, 99, 71)',
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(255, 99, 71)',
+                    pointBorderColor: 'rgb(255, 99, 71)',
+                    yAxisID: 'y',
+                  },
+                  {
+                    label: 'Min Temperature (°C)',
+                    data: minTemps,
+                    type: 'line',
+                    tension: 0.3,
+                    fill: '-1',
+                    backgroundColor: 'rgba(255, 99, 71, 0.2)',
+                    borderColor: 'rgb(255, 154, 71)',
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(255, 154, 71)',
+                    pointBorderColor: 'rgb(255, 154, 71)',
+                    yAxisID: 'y',
+                  },
+                  {
+                    label: 'Précipitations (%)',
+                    data: precips,
+                    type: 'line',
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: 'rgba(0,150,255,0.2)',
+                    borderColor: 'blue',
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(0,150,255,0.8)',
+                    pointBorderColor: 'blue',
+                    yAxisID: 'y1',
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    type: 'category',
+                    title: {
+                      display: true,
+                      text: 'Day',
+                    },
+                  },
+                  y: {
+                    type: 'linear',
+                    position: 'left',
+                    title: { display: true, text: 'Temperature °C', color: 'black' },
+                    ticks: { color: 'black' },
+                  },
+                  y1: {
+                    type: 'linear',
+                    position: 'right',
+                    title: { display: true, text: 'Précipitations %', color: 'black' },
+                    ticks: { color: 'black' },
+                    grid: { drawOnChartArea: false },
+                  },
+                },
+              },
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load weather chart:', error);
+        }
+      };
+
+      if (!document.querySelector('script[src="https://cdn.jsdelivr.net/npm/chart.js"]')) {
+        document.head.appendChild(script);
+      }
+    };
+
+    loadChart();
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-2">Weather in Nyon, Switzerland</h1>
-      <p className="text-gray-600 mb-8">Location: 46.38°N, 6.24°E | Real-time data coming in Phase 5</p>
+      <p className="text-gray-600 mb-8">Location: 46.38°N, 6.24°E</p>
 
       {/* Current Weather */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -57,57 +157,25 @@ export default function WeatherPage() {
             </div>
           </div>
         </div>
-
-        {/* Weather Alert */}
-        <div className="bg-yellow-50 border-2 border-yellow-300 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-3">⚠️ Alert</h3>
-          <p className="text-yellow-800 text-sm">Rain expected in the evening. Remember to bring an umbrella for outdoor activities!</p>
-        </div>
       </div>
 
       {/* 24-Hour Forecast */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-6">24-Hour Forecast</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {forecastDay.map((item, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-lg shadow text-center border-t-4 border-blue-500">
-              <p className="font-semibold text-gray-700 mb-2">{item.time}</p>
-              <p className="text-4xl mb-2">{item.icon}</p>
-              <p className="text-2xl font-bold mb-1 text-black">{item.temp}°C</p>
-              <p className="text-xs text-gray-600">{item.condition}</p>
-            </div>
-          ))}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <canvas id="dayTempChart"></canvas>
         </div>
       </div>
 
-      {/* 7-Day Forecast */}
+      {/* 8-Day Forecast */}
       <div>
-        <h2 className="text-3xl font-bold mb-6">7-Day Forecast</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-blue-600 text-white">
-              <tr>
-                <th className="px-4 py-3 text-left font-semibold">Day</th>
-                <th className="px-4 py-3 text-center font-semibold">Icon</th>
-                <th className="px-4 py-3 text-center font-semibold">High</th>
-                <th className="px-4 py-3 text-center font-semibold">Low</th>
-                <th className="px-4 py-3 text-left font-semibold">Condition</th>
-              </tr>
-            </thead>
-            <tbody>
-              {forecastWeek.map((day, idx) => (
-                <tr key={idx} className={`border-t ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                  <td className="px-4 py-3 font-medium text-gray-800">{day.day}</td>
-                  <td className="px-4 py-3 text-center text-2xl">{day.icon}</td>
-                  <td className="px-4 py-3 text-center font-semibold text-blue-600">{day.high}°C</td>
-                  <td className="px-4 py-3 text-center text-gray-600">{day.low}°C</td>
-                  <td className="px-4 py-3 text-gray-600">{day.condition}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h2 className="text-3xl font-bold mb-6">8-Day Forecast</h2>
+        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
+          <canvas ref={chartRef} id="weekTempChart"></canvas>
         </div>
-        <p className="text-sm text-gray-600 mt-4 italic">📝 Note: This is a mockup forecast. Real data will be fetched from Open-Meteo API in Phase 5.</p>
+        <p className="text-sm text-gray-600 mt-4 italic">
+          Données meteo en temps réel via <a href="https://developer.srgssr.ch/en/apis/srf-meteoapi-v2" target="_blank">SRG SSR API</a>
+        </p>
       </div>
     </div>
   );
