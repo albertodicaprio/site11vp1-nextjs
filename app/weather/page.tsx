@@ -51,7 +51,7 @@ function buildWeekChart(Chart: any, dayData: any) {
       labels: dayLabels,
       datasets: [
         {
-          label: 'Max Temperature (°C)',
+          label: 'Max Température (°C)',
           data: maxTemps,
           type: 'line',
           tension: 0.3,
@@ -64,7 +64,7 @@ function buildWeekChart(Chart: any, dayData: any) {
           yAxisID: 'y',
         },
         {
-          label: 'Min Temperature (°C)',
+          label: 'Min Température (°C)',
           data: minTemps,
           type: 'line',
           tension: 0.3,
@@ -152,7 +152,7 @@ function buildDayChart(Chart: any, hourData: any) {
       labels: hourLabels,
       datasets: [
         {
-          label: 'Temperature (°C)',
+          label: 'Température (°C)',
           data: hourTemps,
           type: 'line',
           tension: 0.3,
@@ -275,14 +275,14 @@ export default function WeatherPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-2">Weather in Nyon, Switzerland</h1>
+      <h1 className="text-4xl font-bold mb-2">Meteo à nyon, Suisse</h1>
       <p className="text-gray-600 mb-8">Location: 46.38°N, 6.24°E</p>
 
       {/* Current Weather */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Main Weather Card */}
         <div className="lg:col-span-2 bg-gradient-to-br from-blue-400 to-blue-600 text-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6">Current Weather</h2>
+          <h2 className="text-2xl font-semibold mb-6">Meteo actuelle</h2>
           <div className="flex justify-between items-center">
             <div>
               <div className="w-32 h-32 mb-4">
@@ -293,15 +293,15 @@ export default function WeatherPage() {
                 />
               </div>
               <p className="text-6xl font-bold mb-2">{currentWeather.temp}°C</p>
-              <p className="text-blue-100 text-sm mt-2">Feels like {currentWeather.feelsLike}°C</p>
+              <p className="text-blue-100 text-sm mt-2">Ressenti:{currentWeather.feelsLike}°C</p>
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <p className="text-blue-600 text-sm">Humidity</p>
+                <p className="text-blue-600 text-sm">Humidité: </p>
                 <p className="text-3xl font-bold text-blue-600">{currentWeather.humidity}%</p>
               </div>
               <div className="bg-white bg-opacity-20 rounded-lg p-4 mt-4">
-                <p className="text-blue-600 text-sm">Wind Speed</p>
+                <p className="text-blue-600 text-sm">Vitesse du vent:</p>
                 <p className="text-3xl font-bold text-blue-600">{currentWeather.windSpeed} km/h</p>
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function WeatherPage() {
 
       {/* 24-Hour Forecast */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-6">24-Hour Forecast</h2>
+        <h2 className="text-3xl font-bold mb-6">prévision 24 heures</h2>
         <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
           <canvas id="dayTempChart"></canvas>
         </div>
@@ -319,7 +319,7 @@ export default function WeatherPage() {
 
       {/* 8-Day Forecast */}
       <div>
-        <h2 className="text-3xl font-bold mb-6">8-Day Forecast</h2>
+        <h2 className="text-3xl font-bold mb-6">prévision 8 jours</h2>
         <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
           <canvas id="weekTempChart"></canvas>
         </div>

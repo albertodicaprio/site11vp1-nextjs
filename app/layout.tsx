@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Class 11VP1 - School Website",
-  description: "Official website for class 11VP1",
+  title: "11vp1 - Site officiel de la classe",
+  description: "Notre site pour la 11vp1 - événements, horaires, et plus encore!",
 };
 
 export default function RootLayout({
@@ -34,7 +34,7 @@ export default function RootLayout({
         </main>
         <footer className="bg-gray-800 text-white py-4 mt-16">
           <div className="max-w-6xl mx-auto px-4 text-center">
-            <p>&copy; 2026 Class 11VP1. All rights reserved.</p>
+            <p>&copy; 2026 Classe 11VP1, tous droits réservés.</p>
           </div>
         </footer>
       </body>

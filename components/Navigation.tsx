@@ -10,10 +10,10 @@ export default function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Weather', href: '/weather' },
-    { label: 'Class Trip', href: '/class-trip' },
-    { label: 'Private Space', href: '/private' },
+    { label: 'Acueil', href: '/' },
+    { label: 'Meteo', href: '/weather' },
+    { label: 'Voyage d\'études', href: '/class-trip' },
+    { label: 'Espace privé', href: '/private' },
   ];
 
   const isActive = (href: string) => {
@@ -28,7 +28,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Branding */}
           <Link href="/" className="text-xl font-bold">
-            Class 11VP1
+            11VP1
           </Link>
 
           {/* Desktop Navigation */}
@@ -37,11 +37,10 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${
-                  isActive(item.href)
-                    ? 'text-white font-semibold border-b-2 border-white pb-1'
-                    : 'text-blue-100 hover:text-white'
-                } transition-colors`}
+                className={`${isActive(item.href)
+                  ? 'text-white font-semibold border-b-2 border-white pb-1'
+                  : 'text-blue-100 hover:text-white'
+                  } transition-colors`}
               >
                 {item.label}
               </Link>
