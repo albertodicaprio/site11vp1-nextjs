@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface ActivityProposal {
   id: string;
@@ -32,8 +34,14 @@ export default function PrivatePage() {
   ]);
   const [newProposerName, setNewProposerName] = useState('');
   const [newActivityText, setNewActivityText] = useState('');
-  const [newActivityDate, setNewActivityDate] = useState('');
-  const today = new Date().toISOString().slice(0, 10);
+  const [newActivityDate, setNewActivityDate] = useState<Date | null>(new Date());
+  const minDate = new Date();
+  const maxDate = new Date('2026-06-26');
+
+  const formatDateForDisplay = (dateString: string) => {
+    const date = new Date(dateString);
+    return Number.isNaN(date.getTime()) ? dateString : date.toLocaleDateString('fr-FR');
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +59,7 @@ export default function PrivatePage() {
     setPassword('');
     setNewProposerName('');
     setNewActivityText('');
-    setNewActivityDate('');
+    setNewActivityDate(null);
   };
 
   const handleAddActivity = (e: React.FormEvent) => {
@@ -61,13 +69,13 @@ export default function PrivatePage() {
         id: Date.now().toString(),
         proposedBy: newProposerName,
         activity: newActivityText,
-        date: newActivityDate,
+        date: newActivityDate.toISOString().slice(0, 10),
         timestamp: Date.now(),
       };
       setActivities([newActivity, ...activities]);
       setNewProposerName('');
       setNewActivityText('');
-      setNewActivityDate('');
+      setNewActivityDate(null);
     }
   };
 
@@ -157,12 +165,12 @@ export default function PrivatePage() {
 
               <div>
                 <label className="block text-green-100 text-sm font-semibold mb-2">Date proposée</label>
-                <input
-                  type="date"
-                  value={newActivityDate}
-                  onChange={(e) => setNewActivityDate(e.target.value)}
-                  min={today}
-                  max="2026-06-26"
+                <DatePicker
+                  selected={newActivityDate}
+                  onChange={(date: Date | null) => setNewActivityDate(date)}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  dateFormat="dd/MM/yyyy"
                   className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
                   required
                 />
@@ -193,7 +201,7 @@ export default function PrivatePage() {
                   <div className="flex justify-between items-start mb-2">
                     <p className="font-bold text-lg text-gray-800">{activity.activity}</p>
                     <span className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
-                      {activity.date}
+                      {formatDateForDisplay(activity.date)}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mb-1">Proposé par: <strong>{activity.proposedBy}</strong></p>

@@ -10,7 +10,7 @@ export default function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'Acueil', href: '/' },
+    { label: 'Accueil', href: '/' },
     { label: 'Meteo', href: '/weather' },
     { label: 'Voyage d\'études', href: '/class-trip' },
     { label: 'Espace privé', href: '/private' },
