@@ -6,6 +6,11 @@ export default function Home() {
   const daysUntilExam = calculateDaysUntil(nextExam.date);
   const upcomingHolidays = getUpcomingHolidays(3).filter(h => h.name !== 'Class Trip - Locarno');
 
+  const formatDateForDisplay = (dateString: string) => {
+    const date = new Date(dateString);
+    return Number.isNaN(date.getTime()) ? dateString : date.toLocaleDateString('fr-FR');
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <div className="mb-12">
@@ -19,7 +24,7 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-4"> {nextExam.name}</h2>
           <p className="text-5xl font-bold mb-2">{daysUntilExam}</p>
           <p className="text-red-100 mb-2">Jours avant l'examen</p>
-          <p className="text-sm text-red-100">Journée examen: {new Date(nextExam.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="text-sm text-red-100">Journée examen: {formatDateForDisplay(nextExam.date)}</p>
         </div>
 
         {/* Quick Stats */}
@@ -27,7 +32,7 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-4"> Vacances</h2>
           <p className="text-sm text-blue-100 mb-2">{upcomingHolidays.length} Vacances prochaines</p>
           <p className="text-2xl font-bold mb-2">Prochaines: {upcomingHolidays[0]?.name || 'N/A'}</p>
-          <p className="text-xs text-blue-100">{upcomingHolidays[0] ? new Date(upcomingHolidays[0].startDate).toLocaleDateString() : ''}</p>
+          <p className="text-xs text-blue-100">{upcomingHolidays[0] ? formatDateForDisplay(upcomingHolidays[0].startDate) : ''}</p>
         </div>
 
         {/* Class Trip */}
@@ -49,10 +54,10 @@ export default function Home() {
             <div key={idx} className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
               <h3 className="text-xl font-semibold mb-2 text-black">{holiday.name}</h3>
               <p className="text-gray-600">
-                <strong>depuis le:</strong> {new Date(holiday.startDate).toLocaleDateString()}
+                <strong>depuis le:</strong> {formatDateForDisplay(holiday.startDate)}
               </p>
               <p className="text-gray-600">
-                <strong>jusqu'au:</strong> {new Date(holiday.endDate).toLocaleDateString()}
+                <strong>jusqu'au:</strong> {formatDateForDisplay(holiday.endDate)}
               </p>
             </div>
           ))}

@@ -12,7 +12,7 @@ export default function Navigation() {
   const navItems = [
     { label: 'Accueil', href: '/' },
     { label: 'Meteo', href: '/weather' },
-    { label: 'Voyage d\'études', href: '/class-trip' },
+    { label: 'Voyage d\'étude', href: '/class-trip' },
     { label: 'Espace privé', href: '/private' },
   ];
 
