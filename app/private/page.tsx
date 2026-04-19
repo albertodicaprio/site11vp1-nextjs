@@ -33,6 +33,7 @@ export default function PrivatePage() {
   const [newProposerName, setNewProposerName] = useState('');
   const [newActivityText, setNewActivityText] = useState('');
   const [newActivityDate, setNewActivityDate] = useState('');
+  const today = new Date().toISOString().slice(0, 10);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ export default function PrivatePage() {
       setIsLoggedIn(true);
       setPassword('');
     } else {
-      setPasswordError('Incorrect password. Please try again.');
+      setPasswordError('Mot de passe incorrect.');
     }
   };
 
@@ -74,20 +75,20 @@ export default function PrivatePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8 text-center">
-          <h1 className="text-4xl font-bold mb-2">🔐 Private Space</h1>
-          <p className="text-purple-100 mb-8">Class 11VP1 - Exclusive Area</p>
+          <h1 className="text-4xl font-bold mb-2">Espace Privé</h1>
+          <p className="text-purple-100 mb-8">Classe 11VP1 - Zone Exclusive</p>
 
           <form onSubmit={handleLogin} className="max-w-md mx-auto">
             <div className="mb-6">
               <label htmlFor="password" className="block text-left text-purple-100 text-sm font-semibold mb-2">
-                Enter Password
+                Mot de passe
               </label>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter class password"
+                placeholder="Entrez le mot de passe "
                 className="w-full px-4 py-3 rounded bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300"
               />
             </div>
@@ -102,11 +103,9 @@ export default function PrivatePage() {
               type="submit"
               className="w-full bg-white text-purple-600 font-bold py-3 rounded hover:bg-purple-50 transition-colors"
             >
-              🔓 Login
+              Se connecter
             </button>
           </form>
-
-          <p className="text-purple-100 text-sm mt-8 italic">💡 Hint: Think of something related to our class...</p>
         </div>
       </div>
     );
@@ -162,8 +161,8 @@ export default function PrivatePage() {
                   type="date"
                   value={newActivityDate}
                   onChange={(e) => setNewActivityDate(e.target.value)}
-                  min="2026-06-15"
-                  max="2026-06-20"
+                  min={today}
+                  max="2026-06-26"
                   className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
                   required
                 />
