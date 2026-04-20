@@ -1,42 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface ActivityProposal {
-  id: string;
-  proposedBy: string;
+  id: number;
+  proposed_by: string;
   activity: string;
   date: string;
-  timestamp: number;
+  status: string | null;
+  timestamp: string;
 }
 
 export default function PrivatePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [activities, setActivities] = useState<ActivityProposal[]>([
-    {
-      id: '1',
-      proposedBy: 'test',
-      activity: 'Volley',
-      date: '2026-06-19',
-      timestamp: Date.now() - 86400000,
-    },
-    {
-      id: '2',
-      proposedBy: 'test2',
-      activity: 'Bowling',
-      date: '2026-06-16',
-      timestamp: Date.now() - 172800000,
-    },
-  ]);
+  const [activities, setActivities] = useState<ActivityProposal[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newProposerName, setNewProposerName] = useState('');
   const [newActivityText, setNewActivityText] = useState('');
   const [newActivityDate, setNewActivityDate] = useState<Date | null>(new Date());
   const minDate = new Date();
   const maxDate = new Date('2026-06-26');
+
+  // Load activities from API when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadActivities();
+    }
+  }, [isLoggedIn]);
+
+  const loadActivities = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/activities');
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des activités');
+      }
+      const data = await response.json();
+      setActivities(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatDateForDisplay = (dateString: string) => {
     const date = new Date(dateString);
@@ -60,22 +73,45 @@ export default function PrivatePage() {
     setNewProposerName('');
     setNewActivityText('');
     setNewActivityDate(null);
+    setActivities([]);
+    setError('');
   };
 
-  const handleAddActivity = (e: React.FormEvent) => {
+  const handleAddActivity = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newProposerName.trim() && newActivityText.trim() && newActivityDate) {
-      const newActivity: ActivityProposal = {
-        id: Date.now().toString(),
-        proposedBy: newProposerName,
-        activity: newActivityText,
-        date: newActivityDate.toISOString().slice(0, 10),
-        timestamp: Date.now(),
-      };
+    if (!newProposerName.trim() || !newActivityText.trim() || !newActivityDate) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    try {
+      const response = await fetch('/api/activities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          proposed_by: newProposerName,
+          activity: newActivityText,
+          date: newActivityDate.toISOString().slice(0, 10),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création de l\'activité');
+      }
+
+      const newActivity = await response.json();
       setActivities([newActivity, ...activities]);
       setNewProposerName('');
       setNewActivityText('');
       setNewActivityDate(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,6 +185,7 @@ export default function PrivatePage() {
                   placeholder="ex: Albert C."
                   className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -160,6 +197,7 @@ export default function PrivatePage() {
                   placeholder="Décris ton idée d'activité..."
                   className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm resize-none h-24"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -173,14 +211,22 @@ export default function PrivatePage() {
                   dateFormat="dd/MM/yyyy"
                   className="w-full px-3 py-2 rounded bg-white bg-opacity-90 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
 
+              {error && (
+                <div className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-2 rounded">
+                  {error}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-white text-green-600 font-bold py-2 rounded hover:bg-green-50 transition-colors mt-4"
+                className="w-full bg-white text-green-600 font-bold py-2 rounded hover:bg-green-50 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                Ajoute ton idée
+                {isSubmitting ? 'Ajout en cours...' : 'Ajoute ton idée'}
               </button>
             </form>
           </div>
@@ -190,7 +236,11 @@ export default function PrivatePage() {
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-bold mb-6">Activités proposées ({activities.length})</h2>
 
-          {activities.length === 0 ? (
+          {isLoading ? (
+            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <p className="text-gray-600 text-lg">Chargement des activités...</p>
+            </div>
+          ) : activities.length === 0 ? (
             <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <p className="text-gray-600 text-lg">Pas d'activités proposées pour le moment. Sois le premier à suggérer quelque chose!</p>
             </div>
@@ -204,9 +254,9 @@ export default function PrivatePage() {
                       {formatDateForDisplay(activity.date)}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-1">Proposé par: <strong>{activity.proposedBy}</strong></p>
+                  <p className="text-sm text-gray-500 mb-1">Proposé par: <strong>{activity.proposed_by}</strong></p>
                   <p className="text-xs text-gray-400">
-                    Ajouté il y a {Math.floor((Date.now() - activity.timestamp) / 86400000)} jours
+                    Ajouté il y a {Math.floor((Date.now() - new Date(activity.timestamp).getTime()) / 86400000)} jours
                   </p>
                 </div>
               ))}
