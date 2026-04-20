@@ -1,0 +1,27 @@
+GET http://localhost:3000/api/activities
+
+
+###
+POST http://localhost:3000/api/activities
+Content-Type: application/json
+
+{
+    "proposed_by": "Test Usery",
+    "activity": "Test Activity",
+    "date": "2024-06-01T10:00:00Z"
+}
+
+###
+DELETE http://localhost:3000/api/activities/5
+
+###
+
+PUT http://localhost:3000/api/activities/2
+Content-Type: application/json
+
+{
+    "proposed_by": "Test Usra",
+    "activity": "Test Activity",
+    "date": "2024-06-01T10:00:00Z",
+    "status": "pending"
+}
