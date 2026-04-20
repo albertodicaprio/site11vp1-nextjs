@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { validatePassword, extractPasswordFromHeader, hasMethodPermission } from '@/lib/auth';
 
 interface ActivityProposal {
     id: number;
@@ -11,12 +12,36 @@ interface ActivityProposal {
 }
 
 /**
+ * Middleware to check authentication
+ */
+function checkAuth(request: Request) {
+    const authHeader = request.headers.get('Authorization');
+    const password = extractPasswordFromHeader(authHeader);
+
+    if (!password) {
+        return { valid: false, role: null };
+    }
+
+    return validatePassword(password);
+}
+
+/**
  * GET /api/activities
  * Retrieve all activities, optionally filtered by status
  * Query params: ?status=pending|accepted|rejected
+ * Auth: USER or ADMIN password required
  */
 export async function GET(request: Request) {
     try {
+        const { valid, role } = checkAuth(request);
+
+        if (!valid || !hasMethodPermission(role, 'GET')) {
+            return NextResponse.json(
+                { error: 'Authentication required or permission denied' },
+                { status: 403 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
 
@@ -50,9 +75,19 @@ export async function GET(request: Request) {
  * POST /api/activities
  * Create a new activity proposal
  * Body: { proposed_by: string, activity: string, date: string (ISO date) }
+ * Auth: USER or ADMIN password required
  */
 export async function POST(request: Request) {
     try {
+        const { valid, role } = checkAuth(request);
+
+        if (!valid || !hasMethodPermission(role, 'POST')) {
+            return NextResponse.json(
+                { error: 'Authentication required or permission denied' },
+                { status: 403 }
+            );
+        }
+
         const body = await request.json();
         const { proposed_by, activity, date } = body;
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { validatePassword, extractPasswordFromHeader, hasMethodPermission } from '@/lib/auth';
 
 interface ActivityProposal {
     id: number;
@@ -11,14 +12,38 @@ interface ActivityProposal {
 }
 
 /**
+ * Middleware to check authentication
+ */
+function checkAuth(request: Request) {
+    const authHeader = request.headers.get('Authorization');
+    const password = extractPasswordFromHeader(authHeader);
+
+    if (!password) {
+        return { valid: false, role: null };
+    }
+
+    return validatePassword(password);
+}
+
+/**
  * GET /api/activities/[id]
  * Retrieve a single activity by ID
+ * Auth: USER or ADMIN password required
  */
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { valid, role } = checkAuth(request);
+
+        if (!valid || !hasMethodPermission(role, 'GET')) {
+            return NextResponse.json(
+                { error: 'Authentication required or permission denied' },
+                { status: 403 }
+            );
+        }
+
         const { id: idParam } = await params;
         const id = parseInt(idParam, 10);
 
@@ -56,12 +81,22 @@ export async function GET(
  * PUT /api/activities/[id]
  * Update an activity by ID
  * Body: { proposed_by?, activity?, date?, status? }
+ * Auth: ADMIN password required
  */
 export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { valid, role } = checkAuth(request);
+
+        if (!valid || !hasMethodPermission(role, 'PUT')) {
+            return NextResponse.json(
+                { error: 'Authentication required or permission denied' },
+                { status: 403 }
+            );
+        }
+
         const { id: idParam } = await params;
         const id = parseInt(idParam, 10);
 
@@ -147,12 +182,22 @@ export async function PUT(
 /**
  * DELETE /api/activities/[id]
  * Delete an activity by ID
+ * Auth: ADMIN password required
  */
 export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { valid, role } = checkAuth(request);
+
+        if (!valid || !hasMethodPermission(role, 'DELETE')) {
+            return NextResponse.json(
+                { error: 'Authentication required or permission denied' },
+                { status: 403 }
+            );
+        }
+
         const { id: idParam } = await params;
         const id = parseInt(idParam, 10);
 

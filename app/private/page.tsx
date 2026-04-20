@@ -17,6 +17,7 @@ export default function PrivatePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const [activities, setActivities] = useState<ActivityProposal[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,16 +30,20 @@ export default function PrivatePage() {
 
   // Load activities from API when logged in
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && authToken) {
       loadActivities();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, authToken]);
 
   const loadActivities = async () => {
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/activities');
+      const response = await fetch('/api/activities', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
       if (!response.ok) {
         throw new Error('Erreur lors du chargement des activités');
       }
@@ -56,19 +61,41 @@ export default function PrivatePage() {
     return Number.isNaN(date.getTime()) ? dateString : date.toLocaleDateString('fr-FR');
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
-    if (password === 'Marens') {
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+        credentials: 'include', // Include cookies
+      });
+
+      if (!response.ok) {
+        setPasswordError('Mot de passe incorrect.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      setAuthToken(password);
       setIsLoggedIn(true);
       setPassword('');
-    } else {
-      setPasswordError('Mot de passe incorrect.');
+    } catch (error) {
+      setPasswordError('Erreur lors de la connexion.');
+      console.error('Login error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setAuthToken(null);
     setPassword('');
     setNewProposerName('');
     setNewActivityText('');
@@ -90,6 +117,7 @@ export default function PrivatePage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           proposed_by: newProposerName,
@@ -145,9 +173,10 @@ export default function PrivatePage() {
 
             <button
               type="submit"
-              className="w-full bg-white text-purple-600 font-bold py-3 rounded hover:bg-purple-50 transition-colors"
+              className="w-full bg-white text-purple-600 font-bold py-3 rounded hover:bg-purple-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Se connecter
+              {isSubmitting ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
         </div>
