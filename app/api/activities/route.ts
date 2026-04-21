@@ -64,6 +64,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(activities);
     } catch (error) {
+        console.error('GET /api/activities error:', error);
         return NextResponse.json(
             { error: 'Erreur lors de la récupération des activités' },
             { status: 500 }
