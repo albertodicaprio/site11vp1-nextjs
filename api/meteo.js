@@ -122,17 +122,18 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Create cache key
-        const cacheKey = "meteo";
+        // Get city from query parameter, default to Nyon
+        const city = req.query.city || "Locarno";
+        const cacheKey = `meteo-${city}`;
         var cachedData = await readCache(cacheKey);
         if (cachedData) {
-            console.log("Returning from cache");
+            console.log(`Returning from cache for ${city}`);
             return res.status(200).json({ ...cachedData, cached: true });
         }
 
-        console.log("Fetching fresh meteo data");
+        console.log(`Fetching fresh meteo data for ${city}`);
         // Fetch data from API
-        const data = await fetchMeteoData("Nyon");
+        const data = await fetchMeteoData(city);
         await writeCache(cacheKey, data);
         return res.status(200).json({ ...data, cached: false });
     } catch (error) {
