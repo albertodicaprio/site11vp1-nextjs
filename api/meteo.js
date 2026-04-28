@@ -123,7 +123,7 @@ export default async function handler(req, res) {
 
     try {
         // Get city from query parameter, default to Nyon
-        const city = req.query.city || "Locarno";
+        const city = req.query.city || "Nyon";
         const cacheKey = `meteo-${city}`;
         var cachedData = await readCache(cacheKey);
         if (cachedData) {
