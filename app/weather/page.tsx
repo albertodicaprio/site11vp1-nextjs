@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 
+const weatherPageBackground = 'https://www.vaud.ch/app/uploads/2025/11/Nyon9-scaled.jpg';
+
 function buildCurrentWeather(setCurrentWeather: any, hourData: any) {
   // Update current weather with the most recent hourly data before now
   const now = new Date();
@@ -274,58 +276,67 @@ export default function WeatherPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-2">Meteo à Nyon, Suisse</h1>
-      <p className="text-gray-600 mb-8">Location: 46.38°N, 6.24°E</p>
+    <div
+      className="min-h-screen bg-slate-900 bg-cover bg-center bg-scroll px-4 py-12"
+      style={{
+        backgroundImage: `url(${weatherPageBackground})`,
+      }}
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="inline-block bg-white/75 px-4 py-3 rounded-lg shadow-lg backdrop-blur-sm mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-slate-950">Meteo à Nyon, Suisse</h1>
+          <p className="text-slate-800">Location: 46.38°N, 6.24°E</p>
+        </div>
 
-      {/* Current Weather */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Main Weather Card */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-blue-400 to-blue-600 text-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6">Meteo actuelle</h2>
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="w-32 h-32 mb-4">
-                <img
-                  src={`/weather-icons/${currentWeather.iconCode}.svg`}
-                  alt="weather icon"
-                  className="w-full h-full"
-                />
+        {/* Current Weather */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Main Weather Card */}
+          <div className="lg:col-span-2 bg-blue-600/80 text-white p-8 rounded-lg shadow-lg backdrop-blur-sm">
+            <h2 className="text-2xl font-semibold mb-6">Meteo actuelle</h2>
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="w-32 h-32 mb-4">
+                  <img
+                    src={`/weather-icons/${currentWeather.iconCode}.svg`}
+                    alt="weather icon"
+                    className="w-full h-full"
+                  />
+                </div>
+                <p className="text-6xl font-bold mb-2">{currentWeather.temp}°C</p>
+                <p className="text-blue-100 text-sm mt-2">Ressenti:{currentWeather.feelsLike}°C</p>
               </div>
-              <p className="text-6xl font-bold mb-2">{currentWeather.temp}°C</p>
-              <p className="text-blue-100 text-sm mt-2">Ressenti:{currentWeather.feelsLike}°C</p>
-            </div>
-            <div className="text-right">
-              <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <p className="text-blue-600 text-sm">Humidité: </p>
-                <p className="text-3xl font-bold text-blue-600">{currentWeather.humidity}%</p>
-              </div>
-              <div className="bg-white bg-opacity-20 rounded-lg p-4 mt-4">
-                <p className="text-blue-600 text-sm">Vitesse du vent:</p>
-                <p className="text-3xl font-bold text-blue-600">{currentWeather.windSpeed} km/h</p>
+              <div className="text-right">
+                <div className="bg-white/70 rounded-lg p-4 backdrop-blur-sm">
+                  <p className="text-blue-900 text-sm">Humidité: </p>
+                  <p className="text-3xl font-bold text-blue-900">{currentWeather.humidity}%</p>
+                </div>
+                <div className="bg-white/70 rounded-lg p-4 mt-4 backdrop-blur-sm">
+                  <p className="text-blue-900 text-sm">Vitesse du vent:</p>
+                  <p className="text-3xl font-bold text-blue-900">{currentWeather.windSpeed} km/h</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 24-Hour Forecast */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-6">prévision 24 heures</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
-          <canvas id="dayTempChart"></canvas>
+        {/* 24-Hour Forecast */}
+        <div className="mb-8">
+          <h2 className="inline-block text-3xl font-bold mb-6 text-slate-950 bg-white/75 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm">prévision 24 heures</h2>
+          <div className="bg-white/75 rounded-lg shadow overflow-hidden backdrop-blur-sm" style={{ height: '300px' }}>
+            <canvas id="dayTempChart"></canvas>
+          </div>
         </div>
-      </div>
 
-      {/* 8-Day Forecast */}
-      <div>
-        <h2 className="text-3xl font-bold mb-6">prévision 8 jours</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: '300px' }}>
-          <canvas id="weekTempChart"></canvas>
+        {/* 8-Day Forecast */}
+        <div>
+          <h2 className="inline-block text-3xl font-bold mb-6 text-slate-950 bg-white/75 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm">prévision 8 jours</h2>
+          <div className="bg-white/75 rounded-lg shadow overflow-hidden backdrop-blur-sm" style={{ height: '300px' }}>
+            <canvas id="weekTempChart"></canvas>
+          </div>
+          <p className="inline-block text-sm text-slate-950 bg-white/75 px-3 py-2 rounded mt-4 italic shadow-lg backdrop-blur-sm">
+            Données meteo en temps réel via <a href="https://developer.srgssr.ch/en/apis/srf-meteoapi-v2" target="_blank" className="font-semibold underline">SRG SSR API</a>
+          </p>
         </div>
-        <p className="text-sm text-gray-600 mt-4 italic">
-          Données meteo en temps réel via <a href="https://developer.srgssr.ch/en/apis/srf-meteoapi-v2" target="_blank">SRG SSR API</a>
-        </p>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ export default function RootLayout({
         <main className="min-h-screen">
           {children}
         </main>
-        <footer className="bg-gray-800 text-white py-4 mt-16">
+        <footer className="text-gray-600 py-4 mt-1">
           <div className="max-w-6xl mx-auto px-4 text-center">
             <p>&copy; 2026 Classe 11VP1, tous droits réservés.</p>
           </div>

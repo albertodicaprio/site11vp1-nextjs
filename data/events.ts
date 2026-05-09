@@ -52,7 +52,7 @@ export const holidays: Holiday[] = [
     type: 'single-day',
   },
   {
-    name: 'Summer Vacation',
+    name: 'Vacances d\'été',
     startDate: '2026-06-27',
     endDate: '2026-08-31',
     type: 'vacation',
